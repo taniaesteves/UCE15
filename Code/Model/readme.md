@@ -1,0 +1,3 @@
+- Script de criação da DB
+- Script de povoação da DB
+- Scripts de geração de outputs
