@@ -1,4 +1,5 @@
 import psycopg2
+import unidecode
 from pprint import pprint
 
 # DATABASE CONFIGURATION
@@ -52,7 +53,8 @@ if rows == []:
     exit()
 
 # KML FILE HEAD
-f = open(catalog_title.replace(" ", "_") + ".kml", "w")
+filename = unidecode.unidecode(catalog_title.replace(" ", "_") + ".kml").lower()
+f = open(filename, "w")
 f.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n")
 f.write("<kml xmlns=\"http://earth.google.com/kml/2.2\">\n")
 f.write("\t<Document>\n")
@@ -113,4 +115,4 @@ f.write("\t</Document>\n")
 f.write("</kml>\n")
 f.close()
 
-print("\nFile '" + catalog_title.replace(" ", "_") + ".kml' created successfully!")
+print("\nFile '" + filename + " created successfully!")
