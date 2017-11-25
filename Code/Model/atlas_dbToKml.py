@@ -83,7 +83,7 @@ for feature in features:
 
 for feature in features:
     try:
-        cur.execute("SELECT DISTINCT id, latitude, longitude, note  FROM marker WHERE featureid=" + str(feature[0]) + ";")
+        cur.execute("SELECT * FROM marker WHERE featureid=" + str(feature[0]) + ";")
     except:
         print("\nERROR: UNABLE TO GET MARKERS")
         exit()
@@ -94,20 +94,11 @@ for feature in features:
         f.write("\t\t<Placemark>\n")
         f.write("\t\t\t<name>" + feature[1] + "</name>\n")
         f.write("\t\t\t<styleUrl>#" + feature[1] + "</styleUrl>\n")
-
-        try:
-            cur.execute("SELECT imagepath FROM image WHERE markerid=" + str(marker[0]) + ";")
-        except:
-            print("\nERROR: UNABLE TO GET IMAGES")
-            exit()
-        
-        rows = cur.fetchall()
         f.write("\t\t\t<description><![CDATA[")
-        for image in rows:
-            f.write("<img src=\"" + image[0] + "\" height=\"200\" width=\"auto\"/>")
+        f.write("<img src=\"" + marker[4] + "\" height=\"200\" width=\"auto\"/>")
         f.write("]]></description>\n")
         f.write("\t\t\t<Point>\n")
-        f.write("\t\t\t\t<coordinates>" + str(marker[2]) + ", " + str(marker[1]) + "</coordinates>\n")
+        f.write("\t\t\t\t<coordinates>" + str(marker[3]) + ", " + str(marker[2]) + "</coordinates>\n")
         f.write("\t\t\t</Point>\n")
         f.write("\t\t</Placemark>\n")
 
