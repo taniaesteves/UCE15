@@ -25,8 +25,7 @@ CREATE TABLE IF NOT EXISTS marker (id SERIAL PRIMARY KEY,
                                    featureid INTEGER NOT NULL REFERENCES feature (id), 
                                    latitude DOUBLE PRECISION, 
                                    longitude DOUBLE PRECISION,
+                                   imagepath TEXT NOT NULL,
+                                   timestamp TIMESTAMP,
+                                   precision DOUBLE PRECISION,
                                    note TEXT);
-
-CREATE TABLE IF NOT EXISTS image (id SERIAL PRIMARY KEY,
-                                  markerid INTEGER NOT NULL REFERENCES marker (id),
-                                  imagepath TEXT NOT NULL);
