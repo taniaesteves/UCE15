@@ -1,10 +1,10 @@
 INSERT INTO client (name, description) VALUES ('Miguel Bandeira', 'Vereador da C.M. Braga');
 
-INSERT INTO catalog (title, description) VALUES ('Sinais de Trânsito', 'Sinais rodoviários da cidade de Braga');
+INSERT INTO catalog (title, description) VALUES ('Sinais de Transito', 'Sinais rodoviarios da cidade de Braga');
 
 INSERT INTO client_catalog VALUES (1, 1, 'Contracto Atlas Innovation - CMBraga');
 
-INSERT INTO feature (title, icon, pathtotrainingdataset) VALUES ('B2 - Paragem obrigatória no cruzamento ou entroncamento', 'https://github.com/taniaesteves/UCE15/blob/master/Code/Model/Catalogs/sinais_de_transito/icons/B2.png?raw=true', 'trainingdataset.png');
+INSERT INTO feature (title, icon, pathtotrainingdataset) VALUES ('B2 - Paragem obrigatoria no cruzamento ou entroncamento', 'https://github.com/taniaesteves/UCE15/blob/master/Code/Model/Catalogs/sinais_de_transito/icons/B2.png?raw=true', 'trainingdataset.png');
 INSERT INTO feature (title, icon, pathtotrainingdataset) VALUES ('D4 - Rotunda', 'https://github.com/taniaesteves/UCE15/blob/master/Code/Model/Catalogs/sinais_de_transito/icons/D4.png?raw=true', 'trainingdataset2.png');
 INSERT INTO feature (title, icon, pathtotrainingdataset) VALUES ('D1A - Sentido obrigatório', 'https://github.com/taniaesteves/UCE15/blob/master/Code/Model/Catalogs/sinais_de_transito/icons/D1A.png?raw=true', 'trainingdataset2.png');
 
