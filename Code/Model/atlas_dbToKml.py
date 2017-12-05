@@ -1,11 +1,14 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 import psycopg2
 import unidecode
 from pprint import pprint
 
 # DATABASE CONFIGURATION
 
-dbname   = 'atlasdb'
-user     = 'tania'
+dbname   = 'atlas'
+user     = 'atlas'
 host     = 'localhost'
 password = ''
 
@@ -54,12 +57,12 @@ if rows == []:
 
 # KML FILE HEAD
 filename = unidecode.unidecode(catalog_title.replace(" ", "_") + ".kml").lower()
-f = open(filename, "w")
-f.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n")
-f.write("<kml xmlns=\"http://earth.google.com/kml/2.2\">\n")
-f.write("\t<Document>\n")
+f = open(filename, "wb")
+f.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n".encode())
+f.write("<kml xmlns=\"http://earth.google.com/kml/2.2\">\n".encode())
+f.write("\t<Document>\n".encode())
 
-f.write("\t\t<name>" + catalog_title + "</name>\n")
+f.write(("\t\t<name>" + catalog_title + "</name>\n").encode())
 
 catalog_id = rows[0][0]
 
@@ -73,13 +76,13 @@ except:
 rows = cur.fetchall()
 features = rows
 for feature in features:
-    f.write("\t\t<Style id=\"" + feature[1] + "\">\n")
-    f.write("\t\t\t<IconStyle>\n")
-    f.write("\t\t\t\t<Icon>\n")
-    f.write("\t\t\t\t\t<href>" + feature[3] + "</href>\n")
-    f.write("\t\t\t\t</Icon>\n")
-    f.write("\t\t\t</IconStyle>\n")
-    f.write("\t\t</Style>\n")
+    f.write(("\t\t<Style id=\"" + feature[1] + "\">\n").encode())
+    f.write("\t\t\t<IconStyle>\n".encode())
+    f.write("\t\t\t\t<Icon>\n".encode())
+    f.write(("\t\t\t\t\t<href>" + feature[3] + "</href>\n").encode())
+    f.write("\t\t\t\t</Icon>\n".encode())
+    f.write("\t\t\t</IconStyle>\n".encode())
+    f.write("\t\t</Style>\n".encode())
 
 for feature in features:
     try:
@@ -91,19 +94,31 @@ for feature in features:
     rows = cur.fetchall()
     markers = rows
     for marker in markers:
-        f.write("\t\t<Placemark>\n")
-        f.write("\t\t\t<name>" + feature[1] + "</name>\n")
-        f.write("\t\t\t<styleUrl>#" + feature[1] + "</styleUrl>\n")
-        f.write("\t\t\t<description><![CDATA[")
-        f.write("<img src=\"" + marker[4] + "\" height=\"200\" width=\"auto\"/>")
-        f.write("]]></description>\n")
-        f.write("\t\t\t<Point>\n")
-        f.write("\t\t\t\t<coordinates>" + str(marker[3]) + ", " + str(marker[2]) + "</coordinates>\n")
-        f.write("\t\t\t</Point>\n")
-        f.write("\t\t</Placemark>\n")
+        f.write("\t\t<Placemark>\n".encode())
+        f.write(("\t\t\t<name>" + feature[1] + "</name>\n").encode())
+        f.write(("\t\t\t<styleUrl>#" + feature[1] + "</styleUrl>\n").encode())
+        f.write("\t\t\t<TimeStamp><when>2012-01-02T12:01:50+01:00</when></TimeStamp>\n".encode())
+        f.write("\t\t\t<description><![CDATA[".encode())
+        f.write(("<img src=\"" + marker[4] + "\" height=\"200\" width=\"auto\"/>").encode())
+        f.write(("]]> " + feature[1] + " </description>\n").encode())
+        f.write(("\t\t\t<ExtendedData>\n").encode())
+        f.write(("\t\t\t\t<Data name=\"timestamp\">\n").encode())
+        f.write(("\t\t\t\t\t<value>" + str(marker[5]) + "</value>\n").encode())
+        f.write("\t\t\t\t</Data>\n".encode())
+        f.write("\t\t\t\t<Data name=\"precisão (%)\">\n".encode())
+        f.write(("\t\t\t\t\t<value>" + str(marker[6]) + "</value>\n").encode())
+        f.write("\t\t\t\t</Data>\n".encode())
+        f.write("\t\t\t\t<Data name=\"nota\">\n".encode())
+        f.write("\t\t\t\t\t<value></value>\n".encode())
+        f.write("\t\t\t\t</Data>\n".encode())
+        f.write("\t\t\t</ExtendedData>\n".encode())
+        f.write("\t\t\t<Point>\n".encode())
+        f.write(("\t\t\t\t<coordinates>" + str(marker[3]) + ", " + str(marker[2]) + "</coordinates>\n").encode())
+        f.write("\t\t\t</Point>\n".encode())
+        f.write("\t\t</Placemark>\n".encode())
 
-f.write("\t</Document>\n")
-f.write("</kml>\n")
+f.write("\t</Document>\n".encode())
+f.write("</kml>\n".encode())
 f.close()
 
 print("\nFile '" + filename + " created successfully!")
