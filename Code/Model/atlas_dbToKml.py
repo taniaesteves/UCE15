@@ -75,6 +75,15 @@ except:
 
 rows = cur.fetchall()
 features = rows
+
+f.write(("\t\t<Style id=\"multiplemarkes\">\n").encode())
+f.write("\t\t\t<IconStyle>\n".encode())
+f.write("\t\t\t\t<Icon>\n".encode())
+f.write(("\t\t\t\t\t<href>https://github.com/taniaesteves/UCE15/blob/master/Code/Model/Catalogs/sinais_de_transito/icons/multiplemarkers.png?raw=true</href>\n").encode())
+f.write("\t\t\t\t</Icon>\n".encode())
+f.write("\t\t\t</IconStyle>\n".encode())
+f.write("\t\t</Style>\n".encode())
+
 for feature in features:
     f.write(("\t\t<Style id=\"" + feature[1] + "\">\n").encode())
     f.write("\t\t\t<IconStyle>\n".encode())
@@ -83,39 +92,74 @@ for feature in features:
     f.write("\t\t\t\t</Icon>\n".encode())
     f.write("\t\t\t</IconStyle>\n".encode())
     f.write("\t\t</Style>\n".encode())
+try:
+    cur.execute("SELECT title as featuretitle, latitude, longitude, imagepath, timestamp, precision, note \
+                 FROM marker m JOIN feature f ON m.featureid=f.id \
+                 ORDER BY latitude, longitude;")
+except:
+    print("\nERROR: UNABLE TO GET MARKERS")
+    exit()
 
-for feature in features:
-    try:
-        cur.execute("SELECT * FROM marker WHERE featureid=" + str(feature[0]) + ";")
-    except:
-        print("\nERROR: UNABLE TO GET MARKERS")
-        exit()
+rows = cur.fetchall()
+marker_dict = {} 
+for row in rows:
+    key = str(row[1]) + "," + str(row[2])
+    newmarker = { "featuretitle": row[0],
+                  "imagepath": row[3],
+                  "timestamp": row[4],
+                  "precision": row[5],
+                  "note": row[6] }
 
-    rows = cur.fetchall()
-    markers = rows
-    for marker in markers:
-        f.write("\t\t<Placemark>\n".encode())
-        f.write(("\t\t\t<name>" + feature[1] + "</name>\n").encode())
-        f.write(("\t\t\t<styleUrl>#" + feature[1] + "</styleUrl>\n").encode())
-        f.write("\t\t\t<TimeStamp><when>2012-01-02T12:01:50+01:00</when></TimeStamp>\n".encode())
+    if key in marker_dict:
+        marker_dict[key].append(newmarker)
+    else:
+        marker_dict[key] = [newmarker]
+        
+for key in marker_dict.keys():
+    lat, lon = key.split(',')
+    markers = marker_dict[key]
+    f.write("\t\t<Placemark>\n".encode())
+
+    if len(marker_dict[key]) > 1:
+        f.write(("\t\t\t<name>Multiple markers</name>\n").encode())
+        f.write(("\t\t\t<styleUrl>#multiplemarkes</styleUrl>\n").encode())
         f.write("\t\t\t<description><![CDATA[".encode())
-        f.write(("<img src=\"" + marker[4] + "\" height=\"200\" width=\"auto\"/>").encode())
-        f.write(("]]> " + feature[1] + " </description>\n").encode())
+        for marker in markers:
+            f.write(("<img src=\"" + marker["imagepath"] + "\" height=\"200\" width=\"auto\"/>").encode())
+        f.write(("]]> " + markers[0]["featuretitle"] + " </description>\n").encode())
         f.write(("\t\t\t<ExtendedData>\n").encode())
         f.write(("\t\t\t\t<Data name=\"timestamp\">\n").encode())
-        f.write(("\t\t\t\t\t<value>" + str(marker[5]) + "</value>\n").encode())
+        f.write(("\t\t\t\t\t<value>" + str(markers[0]["timestamp"]) + "</value>\n").encode())
         f.write("\t\t\t\t</Data>\n".encode())
         f.write("\t\t\t\t<Data name=\"precisão (%)\">\n".encode())
-        f.write(("\t\t\t\t\t<value>" + str(marker[6]) + "</value>\n").encode())
+        f.write(("\t\t\t\t\t<value>" + str(markers[0]["precision"]) + "</value>\n").encode())
         f.write("\t\t\t\t</Data>\n".encode())
         f.write("\t\t\t\t<Data name=\"nota\">\n".encode())
-        f.write("\t\t\t\t\t<value></value>\n".encode())
+        f.write(("\t\t\t\t\t<value>" + str(markers[0]["note"]) + "</value>\n").encode())
         f.write("\t\t\t\t</Data>\n".encode())
         f.write("\t\t\t</ExtendedData>\n".encode())
-        f.write("\t\t\t<Point>\n".encode())
-        f.write(("\t\t\t\t<coordinates>" + str(marker[3]) + ", " + str(marker[2]) + "</coordinates>\n").encode())
-        f.write("\t\t\t</Point>\n".encode())
-        f.write("\t\t</Placemark>\n".encode())
+    else:
+        f.write(("\t\t\t<name>" + markers[0]["featuretitle"] + "</name>\n").encode())
+        f.write(("\t\t\t<styleUrl>#" + markers[0]["featuretitle"] + "</styleUrl>\n").encode())
+        f.write("\t\t\t<description><![CDATA[".encode())
+        f.write(("<img src=\"" + markers[0]["imagepath"] + "\" height=\"200\" width=\"auto\"/>").encode())
+        f.write(("]]> " + markers[0]["featuretitle"] + " </description>\n").encode())
+        f.write(("\t\t\t<ExtendedData>\n").encode())
+        f.write(("\t\t\t\t<Data name=\"timestamp\">\n").encode())
+        f.write(("\t\t\t\t\t<value>" + str(markers[0]["timestamp"]) + "</value>\n").encode())
+        f.write("\t\t\t\t</Data>\n".encode())
+        f.write("\t\t\t\t<Data name=\"precisão (%)\">\n".encode())
+        f.write(("\t\t\t\t\t<value>" + str(markers[0]["precision"]) + "</value>\n").encode())
+        f.write("\t\t\t\t</Data>\n".encode())
+        f.write("\t\t\t\t<Data name=\"nota\">\n".encode())
+        f.write(("\t\t\t\t\t<value>" + str(markers[0]["note"]) + "</value>\n").encode())
+        f.write("\t\t\t\t</Data>\n".encode())
+        f.write("\t\t\t</ExtendedData>\n".encode())
+    
+    f.write("\t\t\t<Point>\n".encode())
+    f.write(("\t\t\t\t<coordinates>" + lon + ", " + lat + "</coordinates>\n").encode())
+    f.write("\t\t\t</Point>\n".encode())
+    f.write("\t\t</Placemark>\n".encode())
 
 f.write("\t</Document>\n".encode())
 f.write("</kml>\n".encode())
