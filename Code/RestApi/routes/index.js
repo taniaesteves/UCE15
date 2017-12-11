@@ -6,11 +6,11 @@ var db = require('../queries');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+  res.render('index', { title: 'Atlas Innovation RESTful API' });
 });
 
-//router.post('/api/createMarker', db.createMarker);
 router.get('/api/getAllMarkers', db.getAllMarkers);
+router.post('/api/createMarker', db.createMarker);
 
 
 module.exports = router;
