@@ -21,12 +21,12 @@ try:
 
 	cur.execute("INSERT INTO client (name, description) VALUES ('Miguel Bandeira', 'Vereador da C.M. Braga');")
 
-	cur.execute("INSERT INTO catalog (title, description) VALUES ('Sinais de Transito', 'Sinais rodoviarios da cidade de Braga'); RETURNING id;")
+	cur.execute("INSERT INTO catalog (title, description) VALUES ('Sinais de Transito', 'Sinais rodoviarios da cidade de Braga') RETURNING id;")
 	catalogid = cursor.fetchone()[0]
 
 	cur.execute("INSERT INTO client_catalog VALUES (1, 1, 'Contracto Atlas Innovation - CMBraga');")
 
-	-- features sinais de trânsito
+	# features sinais de trânsito
 
 	cur.execute("INSERT INTO feature (code, title, icon, pathtotrainingdataset) VALUES ('A1A', 'A1A - Curva à direita', 'https://github.com/taniaesteves/UCE15/blob/master/Code/Model/Catalogs/sinais_de_transito/icons/A1A.png?raw=true', 'trainingdataset.tfrecord') RETURNING id;")
 	id_of_new_row = cursor.fetchone()[0]
@@ -1150,6 +1150,7 @@ try:
 
 except psycopg2.DatabaseError as e:
     print("\nERROR: UNABLE TO INSERT features")
+    print("Error: %s" + e)
     exit()
 
 print("\n " + counter + " FEATURES INSERTED")
