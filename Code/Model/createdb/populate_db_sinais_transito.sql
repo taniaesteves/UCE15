@@ -229,3 +229,12 @@ INSERT INTO feature (code, title, icon, pathtotrainingdataset) VALUES ('H44A', '
 INSERT INTO feature (code, title, icon, pathtotrainingdataset) VALUES ('H44B', 'H44B - Lanço com cobrança electrónica de portagem', 'https://github.com/taniaesteves/UCE15/blob/master/Code/Model/Catalogs/sinais_de_transito/icons/H44B.png?raw=true', 'trainingdataset.tfrecord');
 INSERT INTO feature (code, title, icon, pathtotrainingdataset) VALUES ('H44C', 'H44C - Lanço com cobrança electrónica de portagem', 'https://github.com/taniaesteves/UCE15/blob/master/Code/Model/Catalogs/sinais_de_transito/icons/H44C.png?raw=true', 'trainingdataset.tfrecord');
 INSERT INTO feature (code, title, icon, pathtotrainingdataset) VALUES ('H45', 'H45 - Fim de lanço com cobrança electrónica de portagem', 'https://github.com/taniaesteves/UCE15/blob/master/Code/Model/Catalogs/sinais_de_transito/icons/H45.png?raw=true', 'trainingdataset.tfrecord');
+
+
+DECLARE @cnt INT = 0;
+
+WHILE @cnt < 223
+BEGIN
+   INSERT INTO catalog_feature VALUES (1, @cnt);
+   SET @cnt = @cnt + 1;
+END;
