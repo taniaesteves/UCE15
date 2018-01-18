@@ -4,8 +4,8 @@ from pprint import pprint
 
 # DATABASE CONFIGURATION
 
-dbname   = 'atlasdb'
-user     = 'Luis'
+dbname   = 'atlas'
+user     = 'atlas'
 host     = 'localhost'
 password = ''
 

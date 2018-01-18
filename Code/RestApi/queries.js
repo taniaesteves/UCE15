@@ -1,4 +1,6 @@
+'use strict'
 var promise = require('bluebird');
+const fs = require('fs');
 
 var options = {
   // Initialization Options
@@ -6,7 +8,7 @@ var options = {
 };
 
 var pgp = require('pg-promise')(options);
-var connectionString = 'postgres://localhost:5432/atlasdb';
+var connectionString = 'postgres://localhost:5432/atlas';
 var db = pgp(connectionString);
 
 // add query functions
@@ -15,24 +17,39 @@ var db = pgp(connectionString);
 
 
 function createMarker(req, res, next) {
-	req.body.featureid = parseInt(req.body.featureid);
-	req.body.latitude = parseFloat(req.body.latitude);
-	req.body.longitude = parseFloat(req.body.longitude);
-	req.body.precision = parseFloat(req.body.precision);
-  	db.none('insert into marker(featureid, latitude, longitude, imagepath , timestamp, precision)' +
-    	'values(${featureid}, ${latitude}, ${longitude}, ${imagepath}, ${timestamp}, ${precision})', req.body)
+  let data = req.body.image;
+  let buff = new Buffer(data, 'base64');
+  req.body.featureid = parseInt(req.body.featureid);
+  req.body.latitude = parseFloat(req.body.latitude);
+  req.body.longitude = parseFloat(req.body.longitude);
+  req.body.precision = parseFloat(req.body.precision);
+  
+  var imageName = req.body.featureid +'_'+req.body.latitude +'_'+req.body.longitude+'_'+req.body.timestamp+'.PNG';
+  var filesave = '../Model/Catalogs/sinais_de_transito/figures/' + imageName;
+  filesave = filesave.replace(/ /g, "_");
+  filesave = filesave.replace(/:/g, "-");
+  //console.log(filesave);
+  fs.writeFileSync(filesave, buff);
+  // fs.writeFile(filesave, buff, 'base64', function(err) {
+  // 	console.log(err);
+  // });
+  //fs.writeFileSync("../Model/Catalogs/sinais_de_transito/figures/" + imageName, buff);
+  //console.log("Object: %j", req.body);
+  req.body.image = 'https://github.com/taniaesteves/UCE15/blob/master/Code/Model/Catalogs/sinais_de_transito/figures/'+imageName+'?raw=true'
+    db.none('insert into marker(featureid, latitude, longitude, imagepath , timestamp, precision)' +
+      'values(${featureid}, ${latitude}, ${longitude}, ${image}, ${timestamp}, ${precision})', req.body)
     .then(function () {
-      res.status(200)
-        .json({
-          status: 'success',
-          message: 'Inserted one marker'
-        });
+      res.status(200).send('Acceptable');
+//        status(200)
+//         .json({
+//           status: 'success',
+//           message: 'Inserted one marker'
+//         });
     })
     .catch(function (err) {
       return next(err);
     });
 }
-
 
 function getAllMarkers(req, res, next) {
   db.any('select * from marker')
@@ -49,6 +66,6 @@ function getAllMarkers(req, res, next) {
 }
 
 module.exports = {
-	createMarker: createMarker,
-  	getAllMarkers: getAllMarkers
+    createMarker: createMarker,
+    getAllMarkers: getAllMarkers
 };
