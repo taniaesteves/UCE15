@@ -671,7 +671,7 @@ try:
 
 	cur.execute("INSERT INTO feature (code, title, icon, pathtotrainingdataset) VALUES ('D10', 'D10 - Obrigação de utilizar as luzes de cruzamento (médios) acesas', 'https://github.com/taniaesteves/UCE15/blob/master/Code/Model/Catalogs/sinais_de_transito/icons/D10.png?raw=true', 'trainingdataset.tfrecord') RETURNING id;".encode('latin-1'))
 	id_of_new_row = cur.fetchone()[0]
-	cur.execute("INSERT INTO catalog_feature VALUESstr( (") + catalogid + " , str(") + id_of_new_row + ")")
+	cur.execute("INSERT INTO catalog_feature VALUES (" + str(catalogid) + " , " + str(id_of_new_row) + ")")
 	counter = counter + 1
 
 	cur.execute("INSERT INTO feature (code, title, icon, pathtotrainingdataset) VALUES ('D11A', 'D11A - Fim da via obrigatória para automóveis de mercadorias', 'https://github.com/taniaesteves/UCE15/blob/master/Code/Model/Catalogs/sinais_de_transito/icons/D11A.png?raw=true', 'trainingdataset.tfrecord') RETURNING id;".encode('latin-1'))
