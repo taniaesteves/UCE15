@@ -11,7 +11,8 @@ CREATE TABLE IF NOT EXISTS client_catalog (clientid INTEGER NOT NULL REFERENCES 
                                            contract TEXT NOT NULL,
                                            PRIMARY KEY (clientID, catalogID));
 
-CREATE TABLE IF NOT EXISTS feature (id SERIAL PRIMARY KEY, 
+CREATE TABLE IF NOT EXISTS feature (id SERIAL PRIMARY KEY,
+                                    code TEXT NOT NULL,
                                     title TEXT NOT NULL, 
                                     description TEXT, 
                                     icon TEXT NOT NULL,
