@@ -23,7 +23,7 @@ function createMarker(req, res, next) {
   req.body.latitude = parseFloat(req.body.latitude);
   req.body.longitude = parseFloat(req.body.longitude);
   req.body.precision = parseFloat(req.body.precision);
-  
+  //db.one("select id from feature where code = '$1'",req.body.featureid)
   var imageName = req.body.featureid +'_'+req.body.latitude +'_'+req.body.longitude+'_'+req.body.timestamp+'.PNG';
   imageName = imageName.replace(/ /g, "_");
   imageName = imageName.replace(/:/g, "-");

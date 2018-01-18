@@ -13,7 +13,7 @@ except:
     print("\nERROR: UNABLE TO CONNECT TO THE DATABASE")
     exit()
 
-cur = conn.cursor()
+cur = con.cursor()
 
 try:
     cur.execute("SELECT id from catalog where title='" + catalog_title + "';")
