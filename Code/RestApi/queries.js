@@ -25,9 +25,11 @@ function createMarker(req, res, next) {
   req.body.precision = parseFloat(req.body.precision);
   
   var imageName = req.body.featureid +'_'+req.body.latitude +'_'+req.body.longitude+'_'+req.body.timestamp+'.PNG';
+  imageName = imageName.replace(/ /g, "_");
+  imageName = imageName.replace(/:/g, "-");
   var filesave = '../Model/Catalogs/sinais_de_transito/figures/' + imageName;
-  filesave = filesave.replace(/ /g, "_");
-  filesave = filesave.replace(/:/g, "-");
+  // filesave = filesave.replace(/ /g, "_");
+  // filesave = filesave.replace(/:/g, "-");
   //console.log(filesave);
   fs.writeFileSync(filesave, buff);
   // fs.writeFile(filesave, buff, 'base64', function(err) {
