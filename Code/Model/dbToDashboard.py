@@ -120,16 +120,21 @@ for feature in features:
 		}
 		featurecontent["features"].append(actualfeatureinfo);
 
-	featuremarkersfilename = unidecode.unidecode(feature[1] + ".kml").lower()
-	featuremarkersfile = open(featuremarkersfilename, "wb")
-	featuremarkersfile.write(featurecontent)
-	featuremarkersfile.close()
+	# Write JSON file
+	featuremarkersfilename = unidecode.unidecode(feature[1] + ".geojson").lower()
+	with io.open(featuremarkersfilename, 'wb', encoding='utf8') as outfile:
+	    str_ = json.dumps(featurecontent,
+	                      indent=4, sort_keys=True,
+	                      separators=(',', ': '), ensure_ascii=False)
+	    outfile.write(to_unicode(str_))
 	print("\nFile '" + featuremarkersfile + " created successfully!")	
 
+# Write JSON file
 featuresfilename = unidecode.unidecode("featuresinfo.json")
-featuresfile = open(featuresfilename, "wb")
-featuresfile.write(featuresinfo.encode())
-featuresfile.close()
+with io.open(featuresfilename, 'wb', encoding='utf8') as outfile:
+    str_ = json.dumps(featuresinfo,
+                      indent=4, sort_keys=True,
+                      separators=(',', ': '), ensure_ascii=False)
+    outfile.write(to_unicode(str_))
 print("\nFile '" + featuresfilename + " created successfully!")
-
 
