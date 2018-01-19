@@ -21,20 +21,20 @@ print("Press <e> to edit ou <enter> to continue...")
 option = input()
 
 if (option == 'e' or option == 'E'):
-    print("Enter dbname: ")
-    dbname = input()
-    print("Enter user: ")
-    user = input()
-    print("Enter host: ")
-    host = input()
-    print("Enter password: ")
-    password = input()
-    
+	print("Enter dbname: ")
+	dbname = input()
+	print("Enter user: ")
+	user = input()
+	print("Enter host: ")
+	host = input()
+	print("Enter password: ")
+	password = input()
+	
 try:
-    conn = psycopg2.connect("dbname='" + dbname + "' user='" + user + "' host='" + host + "' password='" + password + "'")
+	conn = psycopg2.connect("dbname='" + dbname + "' user='" + user + "' host='" + host + "' password='" + password + "'")
 except: 
-    print("\nERROR: UNABLE TO CONNECT TO THE DATABASE")
-    exit()
+	print("\nERROR: UNABLE TO CONNECT TO THE DATABASE")
+	exit()
 
 cur = conn.cursor()
 
@@ -44,25 +44,25 @@ print("\nEnter catalog name:")
 catalog_title = input()
 
 try:
-    cur.execute("SELECT id from catalog where title='" + catalog_title + "';")
+	cur.execute("SELECT id from catalog where title='" + catalog_title + "';")
 except:
-    print("\nERROR: UNABLE TO GET CATALOG ID")
-    exit()
+	print("\nERROR: UNABLE TO GET CATALOG ID")
+	exit()
 
 rows = cur.fetchall()
 
 if rows == []:
-    print("\nERROR: CATALOG NAME INVALID")
-    exit()
+	print("\nERROR: CATALOG NAME INVALID")
+	exit()
 
 catalog_id = rows[0][0]
 
 try:
-    cur.execute("SELECT id, code, title, icon FROM feature f JOIN catalog_feature cf ON f.id=cf.featureid \
-                 WHERE cf.catalogid=" + str(catalog_id) + ";")
+	cur.execute("SELECT id, code, title, icon FROM feature f JOIN catalog_feature cf ON f.id=cf.featureid \
+				 WHERE cf.catalogid=" + str(catalog_id) + ";")
 except:
-    print("\nERROR: UNABLE TO GET FEATURES")
-    exit()
+	print("\nERROR: UNABLE TO GET FEATURES")
+	exit()
 
 rows = cur.fetchall()
 features = rows
@@ -85,11 +85,11 @@ for feature in features:
 
 	# search feature's markers
 	try:
-    	cur.execute("SELECT m.id as markerid, latitude, longitude, imagepath, timestamp, precision, note \
-                 	 FROM marker m JOIN feature f ON m.featureid=" + str(feature[0]) + ";")
+		cur.execute("SELECT m.id as markerid, latitude, longitude, imagepath, timestamp, precision, note \
+					 FROM marker m JOIN feature f ON m.featureid=" + str(feature[0]) + ";")
 	except:
-	    print("\nERROR: UNABLE TO GET MARKERS")
-	    exit()
+		print("\nERROR: UNABLE TO GET MARKERS")
+		exit()
 
 	markers = cur.fetchall()
 	
