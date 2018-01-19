@@ -101,7 +101,6 @@ for feature in features:
 		"type": feature[1],
 		"icon": feature[3]
 	}
-	featuresinfo.append(actualfeature)
 
 	# feature file content struct
 	featurecontent = {
@@ -138,14 +137,17 @@ for feature in features:
 		}
 		featurecontent["features"].append(actualfeatureinfo);
 
-	# Write JSON file
-	featuremarkersfilename = unidecode.unidecode("geojsons/" + feature[1] + ".geojson").lower()
-	with io.open(featuremarkersfilename, 'w', encoding='utf8') as outfile:
-	    str_ = json.dumps(featurecontent, cls=Encoder,
-	                      indent=4, sort_keys=True,
-	                      separators=(',', ': '), ensure_ascii=False)
-	    outfile.write(to_unicode(str_))
-	print("\nFile '" + featuremarkersfilename + " created successfully!")	
+
+	if len(markers) > 0:
+		featuresinfo.append(actualfeature)
+		# Write JSON file
+		featuremarkersfilename = unidecode.unidecode("geojsons/" + feature[1] + ".geojson").lower()
+		with io.open(featuremarkersfilename, 'w', encoding='utf8') as outfile:
+		    str_ = json.dumps(featurecontent, cls=Encoder,
+		                      indent=4, sort_keys=True,
+		                      separators=(',', ': '), ensure_ascii=False)
+		    outfile.write(to_unicode(str_))
+		print("\nFile '" + featuremarkersfilename + " created successfully!")	
 
 # Write JSON file
 featuresfilename = unidecode.unidecode("featuresinfo.json")
