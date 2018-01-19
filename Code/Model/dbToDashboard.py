@@ -4,7 +4,14 @@
 import psycopg2
 import psycopg2.extensions
 import unidecode
+import json
+import io
 from pprint import pprint
+
+try:
+    to_unicode = unicode
+except:
+    to_unicode = str
 
 # DATABASE CONFIGURATION
 
@@ -108,7 +115,7 @@ for feature in features:
 			"id": marker[0],
 			"properties": { 
 				"TITLE": feature[2], 
-				"TIMESTAMP": marker[4], 
+				"TIMESTAMP": marker[4].encode(), 
 				"PRECISION": marker[5], 
 				"NOTA": marker[6], 
 				"IMAGE": marker[3] 
@@ -121,17 +128,17 @@ for feature in features:
 		featurecontent["features"].append(actualfeatureinfo);
 
 	# Write JSON file
-	featuremarkersfilename = unidecode.unidecode(feature[1] + ".geojson").lower()
-	with io.open(featuremarkersfilename, 'wb', encoding='utf8') as outfile:
+	featuremarkersfilename = unidecode.unidecode("geojsons/" + feature[1] + ".geojson").lower()
+	with io.open(featuremarkersfilename, 'w', encoding='utf8') as outfile:
 	    str_ = json.dumps(featurecontent,
 	                      indent=4, sort_keys=True,
 	                      separators=(',', ': '), ensure_ascii=False)
 	    outfile.write(to_unicode(str_))
-	print("\nFile '" + featuremarkersfile + " created successfully!")	
+	print("\nFile '" + featuremarkersfilename + " created successfully!")	
 
 # Write JSON file
 featuresfilename = unidecode.unidecode("featuresinfo.json")
-with io.open(featuresfilename, 'wb', encoding='utf8') as outfile:
+with io.open(featuresfilename, 'w', encoding='utf8') as outfile:
     str_ = json.dumps(featuresinfo,
                       indent=4, sort_keys=True,
                       separators=(',', ': '), ensure_ascii=False)
