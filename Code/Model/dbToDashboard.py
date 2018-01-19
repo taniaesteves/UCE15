@@ -13,6 +13,16 @@ try:
 except:
     to_unicode = str
 
+'''Create an encoder subclassing JSON.encoder. 
+Make this encoder aware of our classes (e.g. datetime.datetime objects) 
+'''
+class Encoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, datetime):
+            return obj.isoformat()
+        else:
+            return json.JSONEncoder.default(self, obj)
+
 # DATABASE CONFIGURATION
 
 dbname   = 'atlas'
@@ -130,7 +140,7 @@ for feature in features:
 	# Write JSON file
 	featuremarkersfilename = unidecode.unidecode("geojsons/" + feature[1] + ".geojson").lower()
 	with io.open(featuremarkersfilename, 'w', encoding='utf8') as outfile:
-	    str_ = json.dumps(featurecontent,
+	    str_ = json.dumps(featurecontent, cls=Encoder,
 	                      indent=4, sort_keys=True,
 	                      separators=(',', ': '), ensure_ascii=False)
 	    outfile.write(to_unicode(str_))
@@ -144,4 +154,3 @@ with io.open(featuresfilename, 'w', encoding='utf8') as outfile:
                       separators=(',', ': '), ensure_ascii=False)
     outfile.write(to_unicode(str_))
 print("\nFile '" + featuresfilename + " created successfully!")
-
