@@ -5,6 +5,7 @@ import psycopg2
 import psycopg2.extensions
 import unidecode
 import json
+import datetime
 import io
 from pprint import pprint
 
@@ -125,7 +126,7 @@ for feature in features:
 			"id": marker[0],
 			"properties": { 
 				"TITLE": feature[2], 
-				"TIMESTAMP": marker[4].encode(), 
+				"TIMESTAMP": str(marker[4]), 
 				"PRECISION": marker[5], 
 				"NOTA": marker[6], 
 				"IMAGE": marker[3] 
