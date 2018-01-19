@@ -1,7 +1,8 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
 import psycopg2
+import psycopg2.extensions
 import unidecode
 from pprint import pprint
 
@@ -36,6 +37,7 @@ except:
 	print("\nERROR: UNABLE TO CONNECT TO THE DATABASE")
 	exit()
 
+conn.set_client_encoding('LATIN-1')
 cur = conn.cursor()
 
 # CATALOG NAME
@@ -57,15 +59,21 @@ if rows == []:
 
 catalog_id = rows[0][0]
 
+print("catalog name: " + str(catalog_id))
+
+psycopg2.extensions.register_type(psycopg2.extensions.UNICODE, cur)
+
+print("encoding: " + conn.encoding)
+
 try:
-	cur.execute("SELECT id, code, title, icon FROM feature f JOIN catalog_feature cf ON f.id=cf.featureid \
-				 WHERE cf.catalogid=" + str(catalog_id) + ";")
+        cur.execute("SELECT id, code, title, icon FROM feature f JOIN catalog_feature cf ON f.id=cf.featureid WHERE cf.catalogid=1;")
 except:
 	print("\nERROR: UNABLE TO GET FEATURES")
 	exit()
 
-rows = cur.fetchall()
-features = rows
+print("row count: " +  str(cur.rowcount));
+
+features = cur.fetchall()
 featuresinfo = []
 
 for feature in features:
@@ -114,7 +122,7 @@ for feature in features:
 
 	featuremarkersfilename = unidecode.unidecode(feature[1] + ".kml").lower()
 	featuremarkersfile = open(featuremarkersfilename, "wb")
-	featuremarkersfile.write(featurecontent.encode())
+	featuremarkersfile.write(featurecontent)
 	featuremarkersfile.close()
 	print("\nFile '" + featuremarkersfile + " created successfully!")	
 
