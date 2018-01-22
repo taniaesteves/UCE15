@@ -26,8 +26,8 @@ class Encoder(json.JSONEncoder):
 
 # DATABASE CONFIGURATION
 
-dbname   = 'atlas'
-user     = 'atlas'
+dbname   = 'tania'
+user     = 'tania'
 host     = 'localhost'
 password = ''
 
@@ -55,7 +55,7 @@ except:
 	print("\nERROR: UNABLE TO CONNECT TO THE DATABASE")
 	exit()
 
-conn.set_client_encoding('LATIN-1')
+conn.set_client_encoding('UTF8	')
 cur = conn.cursor()
 
 # CATALOG NAME
@@ -84,12 +84,12 @@ psycopg2.extensions.register_type(psycopg2.extensions.UNICODE, cur)
 print("encoding: " + conn.encoding)
 
 try:
-        cur.execute("SELECT id, code, title, icon FROM feature f JOIN catalog_feature cf ON f.id=cf.featureid WHERE cf.catalogid=1;")
+        cur.execute("SELECT id, code, title, icon FROM feature f JOIN catalog_feature cf ON f.id=cf.featureid WHERE cf.catalogid=" + str(catalog_id) + ";")
 except:
-	print("\nERROR: UNABLE TO GET FEATURES")
+	print("\nERROR: UNABLE TO GET FEATURES: ")
 	exit()
 
-print("row count: " +  str(cur.rowcount));
+print("row count: " +  str(cur.rowcount))
 
 features = cur.fetchall()
 featuresinfo = []
@@ -99,6 +99,7 @@ for feature in features:
 	# add feature to featuresinfo struct
 	actualfeature = {
 		"type": feature[1],
+		"title": feature[2],
 		"icon": feature[3]
 	}
 
@@ -110,8 +111,7 @@ for feature in features:
 
 	# search feature's markers
 	try:
-		cur.execute("SELECT m.id as markerid, latitude, longitude, imagepath, timestamp, precision, note \
-					 FROM marker m JOIN feature f ON m.featureid=" + str(feature[0]) + ";")
+		cur.execute(" SELECT id, latitude, longitude, imagepath, timestamp, precision, note, address FROM marker where featureid=" + str(feature[0]) + ";")
 	except:
 		print("\nERROR: UNABLE TO GET MARKERS")
 		exit()
@@ -124,11 +124,12 @@ for feature in features:
 			"type": "Feature",
 			"id": marker[0],
 			"properties": { 
-				"TITLE": feature[2], 
+				"TITLE": feature[1] + " - " + marker[7], 
 				"TIMESTAMP": str(marker[4]), 
 				"PRECISION": marker[5], 
 				"NOTA": marker[6], 
-				"IMAGE": marker[3] 
+				"IMAGE": marker[3],
+				"ADDRESS": marker[7]
 			}, 
 			"geometry": { 
 				"type": "Point", 
@@ -150,7 +151,7 @@ for feature in features:
 		print("\nFile '" + featuremarkersfilename + " created successfully!")	
 
 # Write JSON file
-featuresfilename = unidecode.unidecode("featuresinfo.json")
+featuresfilename = unidecode.unidecode("geojsons/featuresinfo.json")
 with io.open(featuresfilename, 'w', encoding='utf8') as outfile:
     str_ = json.dumps(featuresinfo,
                       indent=4, sort_keys=True,

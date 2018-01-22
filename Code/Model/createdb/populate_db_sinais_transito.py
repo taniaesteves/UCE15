@@ -8,7 +8,7 @@ import sys
 con = None
 
 try:
-    con = psycopg2.connect("dbname='atlas' user='atlas' host='localhost' password=''")   
+    con = psycopg2.connect("dbname='tania' user='tania' host='localhost' password=''")   
 except: 
     print("\nERROR: UNABLE TO CONNECT TO THE DATABASE")
     exit()
@@ -1153,4 +1153,4 @@ except psycopg2.DatabaseError as e:
     print("Error: %s" + e)
     exit()
 
-print("\n " + counter + " FEATURES INSERTED")
+print("\n " + str(counter) + " FEATURES INSERTED")
