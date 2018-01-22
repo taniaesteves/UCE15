@@ -29,4 +29,5 @@ CREATE TABLE IF NOT EXISTS marker (id SERIAL PRIMARY KEY,
                                    imagepath TEXT NOT NULL,
                                    timestamp TIMESTAMP,
                                    precision DOUBLE PRECISION,
+                                   address TEXT,
                                    note TEXT);
