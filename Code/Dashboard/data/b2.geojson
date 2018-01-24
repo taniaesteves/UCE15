@@ -1,0 +1,24 @@
+{
+    "features": [
+        {
+            "geometry": {
+                "coordinates": [
+                    -8.4056225,
+                    41.560404
+                ],
+                "type": "Point"
+            },
+            "id": 1,
+            "properties": {
+                "ADDRESS": "Rua AAA",
+                "IMAGE": "https://github.com/taniaesteves/UCE15/blob/master/Code/Model/Catalogs/sinais_de_transito/test/figures/b2_2017-11-25_20-38-25.PNG?raw=true",
+                "NOTA": null,
+                "PRECISION": 89.0,
+                "TIMESTAMP": "2017-11-25 20:38:25",
+                "TITLE": "B2 - Rua AAA"
+            },
+            "type": "Feature"
+        }
+    ],
+    "type": "FeatureCollection"
+}

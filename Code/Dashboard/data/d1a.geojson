@@ -1,0 +1,24 @@
+{
+    "features": [
+        {
+            "geometry": {
+                "coordinates": [
+                    -8.3976456,
+                    41.5580814
+                ],
+                "type": "Point"
+            },
+            "id": 3,
+            "properties": {
+                "ADDRESS": "Rua CCC",
+                "IMAGE": "https://github.com/taniaesteves/UCE15/blob/master/Code/Model/Catalogs/sinais_de_transito/test/figures/d1a_2017-11-25_20-38-54.PNG?raw=true",
+                "NOTA": null,
+                "PRECISION": 74.0,
+                "TIMESTAMP": "2017-11-25 20:38:54",
+                "TITLE": "D1A - Rua CCC"
+            },
+            "type": "Feature"
+        }
+    ],
+    "type": "FeatureCollection"
+}

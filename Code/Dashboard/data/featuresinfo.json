@@ -1,0 +1,22 @@
+[
+    {
+        "icon": "https://github.com/taniaesteves/UCE15/blob/master/Code/Model/Catalogs/sinais_de_transito/icons/B2.png?raw=true",
+        "title": "B2 - Paragem obrigatória no cruzamento ou entroncamento",
+        "type": "B2"
+    },
+    {
+        "icon": "https://github.com/taniaesteves/UCE15/blob/master/Code/Model/Catalogs/sinais_de_transito/icons/D1A.png?raw=true",
+        "title": "D1A - Sentido obrigatório",
+        "type": "D1A"
+    },
+    {
+        "icon": "https://github.com/taniaesteves/UCE15/blob/master/Code/Model/Catalogs/sinais_de_transito/icons/D4.png?raw=true",
+        "title": "D4 - Rotunda",
+        "type": "D4"
+    },
+    {
+        "icon": "https://github.com/taniaesteves/UCE15/blob/master/Code/Model/Catalogs/sinais_de_transito/icons/H7.png?raw=true",
+        "title": "H7 - Passagem para peões",
+        "type": "H7"
+    }
+]

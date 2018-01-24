@@ -1,0 +1,43 @@
+{
+    "features": [
+        {
+            "geometry": {
+                "coordinates": [
+                    -8.4056225,
+                    41.560404
+                ],
+                "type": "Point"
+            },
+            "id": 2,
+            "properties": {
+                "ADDRESS": "Rua BBB",
+                "IMAGE": "https://github.com/taniaesteves/UCE15/blob/master/Code/Model/Catalogs/sinais_de_transito/test/figures/d4_2017-11-25_19-02-14.PNG?raw=true",
+                "NOTA": null,
+                "PRECISION": 68.0,
+                "TIMESTAMP": "2017-11-25 19:02:14",
+                "TITLE": "D4 - Rua BBB"
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {
+                "coordinates": [
+                    -8.3981922,
+                    41.5580606
+                ],
+                "type": "Point"
+            },
+            "id": 5,
+            "properties": {
+                "ADDRESS": "Rua EEE",
+                "IMAGE": "https://github.com/taniaesteves/UCE15/blob/master/Code/Model/Catalogs/sinais_de_transito/test/figures/d4_2017-11-25_17-15-52.PNG?raw=true",
+                "NOTA": null,
+                "PRECISION": 80.0,
+                "TIMESTAMP": "2017-11-25 17:15:52",
+                "TITLE": "D4 - Rua EEE"
+            },
+            "type": "Feature"
+        }
+    ],
+    "type": "FeatureCollection"
+}
