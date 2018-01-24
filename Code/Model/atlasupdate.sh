@@ -12,12 +12,14 @@ pidFile="$daemonName.pid"
 
 logDir="."
 # To use a dated log file.
-# logFile="$logDir/$daemonName-"`date +"%Y-%m-%d"`".log"
+logFile="$logDir/$daemonName-"`date +"%Y-%m-%d"`".log"
 # To use a regular log file.
-logFile="$logDir/$daemonName.log"
+#logFile="$logDir/$daemonName.log"
 
-modelDir="/mnt/c/Users/ainat/Documents/UCE15/Code/Model/"
-geojsonsDir="$modelDir/geojsons/"
+echo "$logFile"
+
+modelDir="/home/atlas/AtlasInnovation/UCE15/Code/Model"
+geojsonsDir="/home/atlas/geojsons"
 
 # Log maxsize in KB
 logMaxSize=1024   # 1mb
@@ -29,8 +31,8 @@ doCommands() {
   echo "Running commands."
   echo "cenas: $modelDir"
   echo "Python dbToDashboard"
-  python `$modelDir/dbToDashboard.py`
-#  echo "geojsons copied"
+  echo -e "\nSinais de Transito\n" | python3 $modelDir/dbToDashboard.py
+  echo "geojsons copied"
 #  cp -r $modelDir/geojson /mnt/c/Users/ainat/Desktop/
 }
 
@@ -48,7 +50,7 @@ setupDaemon() {
   if [ ! -d "$logDir" ]; then
     mkdir "$logDir"
   fi
-  if [ ! -f "$geojsonsDir" ]; then
+  if [ ! -d "$geojsonsDir" ]; then
     mkdir "$geojsonsDir"
   fi
   if [ ! -f "$logFile" ]; then
