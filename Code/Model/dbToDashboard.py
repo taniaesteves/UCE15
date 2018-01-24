@@ -142,7 +142,7 @@ for feature in features:
 	if len(markers) > 0:
 		featuresinfo.append(actualfeature)
 		# Write JSON file
-		featuremarkersfilename = unidecode.unidecode("geojsons/" + feature[1] + ".geojson").lower()
+		featuremarkersfilename = unidecode.unidecode("~/geojsons/" + feature[1] + ".geojson").lower()
 		with io.open(featuremarkersfilename, 'w', encoding='utf8') as outfile:
 		    str_ = json.dumps(featurecontent, cls=Encoder,
 		                      indent=4, sort_keys=True,
@@ -151,7 +151,7 @@ for feature in features:
 		print("\nFile '" + featuremarkersfilename + " created successfully!")	
 
 # Write JSON file
-featuresfilename = unidecode.unidecode("geojsons/featuresinfo.json")
+featuresfilename = unidecode.unidecode("~/geojsons/featuresinfo.json")
 with io.open(featuresfilename, 'w', encoding='utf8') as outfile:
     str_ = json.dumps(featuresinfo,
                       indent=4, sort_keys=True,
