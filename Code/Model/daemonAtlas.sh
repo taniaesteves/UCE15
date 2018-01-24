@@ -11,5 +11,5 @@ do
 	echo -e "\nSinais de Transito\n" | python3 $modelDir/dbToDashboard.py > /home/atlas/logs_daemon.txt
 	rm $dashboardDir/data/*
 	cp $geojsonsDir/* $dashboardDir/data/
-	sleep 2m
+	sleep 30
 done

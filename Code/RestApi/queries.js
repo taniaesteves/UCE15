@@ -62,7 +62,7 @@ function createMarker(req, res, next) {
       fs.writeFileSync(filesave, buff);
       // console.log(idfeat);
       req.body.label = idfeat;
-      req.body.image = 'https://github.com/taniaesteves/UCE15/blob/master/Code/Model/Catalogs/sinais_de_transito/figures/'+imageName+'?raw=true';
+      req.body.image = 'sinais_de_transito/figures/'+imageName;
       db.many('select * from marker where (abs(latitude-($1)) < 0.00005) and (abs(longitude-($2)) < 0.00007) and featureid = $3', 
           [req.body.latitude, req.body.longitude, req.body.label])
           .then(dados => {
