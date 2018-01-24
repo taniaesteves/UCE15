@@ -11,6 +11,7 @@ router.get('/', function(req, res, next) {
 
 router.get('/api/getAllMarkers', db.getAllMarkers);
 router.post('/api/createMarker', db.createMarker);
+router.post('/api/multiMarker', db.multiMarker);
 
 
 module.exports = router;
