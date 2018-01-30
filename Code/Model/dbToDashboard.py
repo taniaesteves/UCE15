@@ -111,7 +111,7 @@ for feature in features:
 
 	# search feature's markers
 	try:
-		cur.execute(" SELECT id, latitude, longitude, imagepath, timestamp, precision, note, address FROM marker where featureid=" + str(feature[0]) + ";")
+		cur.execute(" SELECT id, latitude, longitude, imagepath, first_timestamp, precision, note, address FROM marker where featureid=" + str(feature[0]) + ";")
 	except:
 		print("\nERROR: UNABLE TO GET MARKERS")
 		exit()

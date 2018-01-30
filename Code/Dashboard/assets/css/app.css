@@ -78,7 +78,7 @@ input[type="radio"], input[type="checkbox"] {
   font-weight: normal;
   margin-bottom: 0px;
 }
-.leaflet-control-layers-list input[type="radio"], input[type="checkbox"] {
+.leaflet-control-layers-list input[type="radio"], input[type="radio"] {
   margin: 2px;
 }
 .table {

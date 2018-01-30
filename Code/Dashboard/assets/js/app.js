@@ -99,6 +99,7 @@ $.getJSON("data/featuresinfo.json", function (data) {
       'icon': element.icon,
       'search': [],
       'layer': L.geoJson(null),
+      'delta': element.delta,
       'markers': L.geoJson(null, {        
         pointToLayer: function (feature, latlng) {
           return L.marker(latlng, {
@@ -113,7 +114,6 @@ $.getJSON("data/featuresinfo.json", function (data) {
           });
         },
         onEachFeature: function (feature, layer) {
-          
             if (feature.properties) {
               var content = "<img src='" + feature.properties.IMAGE + "' width='100%'><table class='table table-striped table-bordered table-condensed'>" + "<tr><th>TITLE</th><td>" + element.title + "</td></tr>" + "<tr><th>TIMESTAMP</th><td>" + feature.properties.TIMESTAMP + "</td></tr>" + "<tr><th>PRECISION</th><td>" + feature.properties.PRECISION + "</td></tr>" + "</td></tr>" + "<tr><th>ADDRESS</th><td>" + feature.properties.ADDRESS + "</td></tr><table>";
               layer.on({
@@ -140,12 +140,11 @@ $.getJSON("data/featuresinfo.json", function (data) {
     };
     $.getJSON("data/" + element.type + ".geojson", function (data) {
       // console.log("DATA MARKERS " + element.type + ": " + JSON.stringify(data));                    
-      featuresInfo[element.type]["markers"].addData(data);                  
+      featuresInfo[element.type]["markers"].addData(data);
     });    
   });
   
 });
-
 
 function syncSidebar() {
   /* Empty sidebar features */
@@ -162,7 +161,7 @@ function syncSidebar() {
             }
         }
     });
-});
+  });
 
   /* Update list.js featureList */
   featureList = new List("features", {
@@ -178,16 +177,27 @@ var cartoLight = L.tileLayer("https://cartodb-basemaps-{s}.global.ssl.fastly.net
   maxZoom: 19,
   attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://cartodb.com/attributions">CartoDB</a>'
 });
-var usgsImagery = L.layerGroup([L.tileLayer("http://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryOnly/MapServer/tile/{z}/{y}/{x}", {
-  maxZoom: 15,
-}), L.tileLayer.wms("http://raster.nationalmap.gov/arcgis/services/Orthoimagery/USGS_EROS_Ortho_SCALE/ImageServer/WMSServer?", {
-  minZoom: 16,
+
+var osm =  L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
   maxZoom: 19,
-  layers: "0",
-  format: 'image/jpeg',
-  transparent: true,
-  attribution: "Aerial Imagery courtesy USGS"
-})]);
+  attribution: '&copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
+});
+
+// var osm =  L.tileLayer('http://{s}.tiles.wmflabs.org/hikebike/{z}/{x}/{y}.png', {
+// 	maxZoom: 19,
+// 	attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+// });
+
+// var usgsImagery = L.layerGroup([L.tileLayer("http://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryOnly/MapServer/tile/{z}/{y}/{x}", {
+//   maxZoom: 15,
+// }), L.tileLayer.wms("http://raster.nationalmap.gov/arcgis/services/Orthoimagery/USGS_EROS_Ortho_SCALE/ImageServer/WMSServer?", {
+//   minZoom: 16,
+//   maxZoom: 19,
+//   layers: "0",
+//   format: 'image/jpeg',
+//   transparent: true,
+//   attribution: "Aerial Imagery courtesy USGS"
+// })]);
 
 /* Overlay Layers */
 var highlight = L.geoJson(null);
@@ -214,6 +224,7 @@ map = L.map("map", {
   zoomControl: false,
   attributionControl: false
 });
+
 
 /* Layer control listeners that allow for a single markerClusters layer */
 map.on("overlayadd", function(e) {
@@ -311,16 +322,21 @@ if (document.body.clientWidth <= 767) {
 }
 
 var baseLayers = {
-  "Street Map": cartoLight,
-  "Aerial Imagery": usgsImagery
+  "Cartodb": cartoLight,
+  "OpenStreetMap": osm
 };
 
 var groupedOverlays = {
-  "Points of Interest": {}
+  "Points of Interest": {},
+  "Delta": {},
 };
 
-$.each(featuresInfo, function(i, element) {
-  groupedOverlays["Points of Interest"]["<img src='" + element.icon + "' width='24' height='28'>&nbsp;" + element.type] = featuresInfo[element.type]["layer"];
+$.each(featuresInfo, function(i, element) {  
+  if (element.delta === 'All')
+    groupedOverlays["Points of Interest"][ "<img src='" + element.icon + "' width='24' height='28'>&nbsp;" + element.type] = featuresInfo[element.type]["layer"];  
+  else if (element.delta === 'LastMonth') {
+    groupedOverlays["Delta"][ "<img src='" + element.icon + "' width='24' height='28'>&nbsp;" + element.type.substring( 0, element.type.indexOf( "_delta" ) )] = featuresInfo[element.type]["layer"];      
+  }
 });
 
 var layerControl = L.control.groupedLayers(baseLayers, groupedOverlays, {

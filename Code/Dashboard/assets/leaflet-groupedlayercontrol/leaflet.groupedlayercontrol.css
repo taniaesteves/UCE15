@@ -11,3 +11,13 @@
 .leaflet-control-layers-group label {
   padding-left: .5em;
 }
+
+.leaflet-control-layers-time-group-name {
+  font-weight: bold;
+  margin-bottom: .2em;
+  display: block;
+}
+
+.leaflet-control-layers-time-group {
+  margin-bottom: .5em;
+}
