@@ -102,7 +102,7 @@ $.getJSON("data/featuresinfo.json", function (data) {
       'delta': element.delta,
       'markers': L.geoJson(null, {        
         pointToLayer: function (feature, latlng) {
-          return L.marker(latlng, {
+          var marker = L.marker(latlng, {
             icon: L.icon({
               iconUrl: element.icon,
               iconSize: [32, ],
@@ -112,27 +112,37 @@ $.getJSON("data/featuresinfo.json", function (data) {
             title: feature.properties.TITLE,
             riseOnHover: true
           });
+          marker.options.icon.options.className = feature.properties.DELTA;
+          return marker;
         },
         onEachFeature: function (feature, layer) {
-            if (feature.properties) {
-              var content = "<img src='" + feature.properties.IMAGE + "' width='100%'><table class='table table-striped table-bordered table-condensed'>" + "<tr><th>TITLE</th><td>" + element.title + "</td></tr>" + "<tr><th>TIMESTAMP</th><td>" + feature.properties.TIMESTAMP + "</td></tr>" + "<tr><th>PRECISION</th><td>" + feature.properties.PRECISION + "</td></tr>" + "</td></tr>" + "<tr><th>ADDRESS</th><td>" + feature.properties.ADDRESS + "</td></tr><table>";
-              layer.on({
-                  click: function (e) {
-                      $("#feature-title").html(element.title + " [ " + feature.properties.ADDRESS + " ]");
-                      $("#feature-info").html(content);
-                      $("#featureModal").modal("show");
-                      highlight.clearLayers().addLayer(L.circleMarker([feature.geometry.coordinates[1], feature.geometry.coordinates[0]], highlightStyle));
-                  }
-              });
-              $("#feature-list tbody").append('<tr class="feature-row" id="' + L.stamp(layer) + '" lat="' + layer.getLatLng().lat + '" lng="' + layer.getLatLng().lng + '"><td style="vertical-align: middle;"><img width="16" height="18" src="' + element.icon + '"></td><td class="feature-name">' + layer.feature.properties.TITLE + '</td><td style="vertical-align: middle;"><i class="fa fa-chevron-right pull-right"></i></td></tr>');                
-              featuresInfo[element.type]["search"].push({
-                  name: layer.feature.properties.TITLE,
-                  address: layer.feature.geometry.coordinates[1] + layer.feature.geometry.coordinates[0],
-                  source: element.type,
-                  id: L.stamp(layer),
-                  lat: layer.feature.geometry.coordinates[1],
-                  lng: layer.feature.geometry.coordinates[0]
-              });
+          if (feature.properties) {
+            var content = '<div class="w3-content w3-display-container">';
+            $.each(feature.properties.IMAGES, function (src) {
+              content = content + ' <img class="mySlides" src="' + feature.properties.IMAGES[src] + '" style="width:100%">'
+            });
+            content = content + '<button class="w3-button w3-black w3-display-left" onclick="plusDivs(-1)">&#10094;</button> <button class="w3-button w3-black w3-display-right" onclick="plusDivs(1)">&#10095;</button></div>';
+            content = content + "<table class='table table-striped table-bordered table-condensed'>" + "<tr><th>Title</th><td>" + element.title + "</td></tr>" + "<tr><th>Last Detection</th><td>" + feature.properties.TIMESTAMP + "</td></tr>" + "<tr><th>Precision of Detection</th><td>" + feature.properties.PRECISION + "</td></tr>" + "</td></tr>" + "<tr><th>Address</th><td>" + feature.properties.ADDRESS + "</td></tr><table>";
+            layer.on({
+              click: function (e) {
+                $("#feature-title").html(element.title);
+                $("#feature-addr").html(" [ " + feature.properties.ADDRESS + " ]");
+                $("#feature-info").html(content);
+                $("#featureModal").modal("show");
+                highlight.clearLayers().addLayer(L.circleMarker([feature.geometry.coordinates[1], feature.geometry.coordinates[0]], highlightStyle));
+                showDivs(slideIndex);
+              }
+            });
+            console.log(feature.properties.DELTA);  
+            $("#feature-list tbody").append('<tr class="feature-row" id="' + L.stamp(layer) + '" lat="' + layer.getLatLng().lat + '" lng="' + layer.getLatLng().lng + '"><td style="vertical-align: middle;"><img width="16" height="18" src="' + element.icon + '" class="' + feature.properties.DELTA + '"></td><td class="feature-name">' + layer.feature.properties.TITLE + '</td><td style="vertical-align: middle;"><i class="fa fa-chevron-right pull-right"></i></td></tr>');                
+            featuresInfo[element.type]["search"].push({
+              name: layer.feature.properties.TITLE,
+              address: layer.feature.geometry.coordinates[1] + layer.feature.geometry.coordinates[0],
+              source: element.type,
+              id: L.stamp(layer),
+              lat: layer.feature.geometry.coordinates[1],
+              lng: layer.feature.geometry.coordinates[0]
+            });
           }
         }        
       }),      
@@ -146,23 +156,35 @@ $.getJSON("data/featuresinfo.json", function (data) {
   
 });
 
+var slideIndex = 1;
+function plusDivs(n) {showDivs(slideIndex += n);}
+function showDivs(n) {
+  var i;
+  var x = document.getElementsByClassName("mySlides");
+  if (n > x.length) {slideIndex = 1}
+  if (n < 1) {slideIndex = x.length}
+  for (i = 0; i < x.length; i++) { x[i].style.display = "none"; }
+  x[slideIndex-1].style.display = "block";
+}
+
+
 function syncSidebar() {
   /* Empty sidebar features */
   $("#feature-list tbody").empty();  
-
+  
   // console.log("sysncSidebar");  
-
+  
   /* Loop through signals layer and add only features which are in the map bounds */
   $.each(featuresInfo, function(i, element) {    
     element['markers'].eachLayer(function (layer_x) {        
-        if (map.hasLayer(element.layer)) {
-            if (map.getBounds().contains(layer_x.getLatLng())) {
-                  $("#feature-list tbody").append('<tr class="feature-row" id="' + L.stamp(layer_x) + '" lat="' + layer_x.getLatLng().lat + '" lng="' + layer_x.getLatLng().lng + '"><td style="vertical-align: middle;"><img width="16" height="18" src="' + element.icon + '"></td><td class="feature-name">' + layer_x.feature.properties.TITLE + '</td><td style="vertical-align: middle;"><i class="fa fa-chevron-right pull-right"></i></td></tr>');
-            }
+      if (map.hasLayer(element.layer)) {
+        if (map.getBounds().contains(layer_x.getLatLng())) {
+          $("#feature-list tbody").append('<tr class="feature-row" id="' + L.stamp(layer_x) + '" lat="' + layer_x.getLatLng().lat + '" lng="' + layer_x.getLatLng().lng + '"><td style="vertical-align: middle;"><img width="16" height="18" src="' + element.icon + '" class="' + layer_x.feature.properties.DELTA + '"></td><td class="feature-name">' + layer_x.feature.properties.TITLE + '</td><td style="vertical-align: middle;"><i class="fa fa-chevron-right pull-right"></i></td></tr>');
         }
+      }
     });
   });
-
+  
   /* Update list.js featureList */
   featureList = new List("features", {
     valueNames: ["feature-name"]
@@ -174,13 +196,13 @@ function syncSidebar() {
 
 /* Basemap Layers */
 var cartoLight = L.tileLayer("https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png", {
-  maxZoom: 19,
-  attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://cartodb.com/attributions">CartoDB</a>'
+maxZoom: 19,
+attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://cartodb.com/attributions">CartoDB</a>'
 });
 
 var osm =  L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-  maxZoom: 19,
-  attribution: '&copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
+maxZoom: 19,
+attribution: '&copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
 });
 
 // var osm =  L.tileLayer('http://{s}.tiles.wmflabs.org/hikebike/{z}/{x}/{y}.png', {
@@ -230,9 +252,9 @@ map = L.map("map", {
 map.on("overlayadd", function(e) {
   $.each(featuresInfo, function(i, element) {
     if (e.layer === element.layer) {  
-        console.log("aaaaaaa");
-        markerClusters.addLayer(element.markers);
-        syncSidebar();
+      console.log("aaaaaaa");
+      markerClusters.addLayer(element.markers);
+      syncSidebar();
     }
   });
 });
@@ -240,9 +262,9 @@ map.on("overlayadd", function(e) {
 map.on("overlayremove", function(e) {
   $.each(featuresInfo, function(i, element) {
     if (e.layer === element.layer) {  
-        console.log("oooooooo");
-        markerClusters.removeLayer(element.markers);
-        syncSidebar();
+      console.log("oooooooo");
+      markerClusters.removeLayer(element.markers);
+      syncSidebar();
     }
   });
 });
@@ -333,7 +355,7 @@ var groupedOverlays = {
 
 $.each(featuresInfo, function(i, element) {  
   if (element.delta === 'All')
-    groupedOverlays["Points of Interest"][ "<img src='" + element.icon + "' width='24' height='28'>&nbsp;" + element.type] = featuresInfo[element.type]["layer"];  
+  groupedOverlays["Points of Interest"][ "<img src='" + element.icon + "' width='24' height='28'>&nbsp;" + element.type] = featuresInfo[element.type]["layer"];  
   else if (element.delta === 'LastMonth') {
     groupedOverlays["Delta"][ "<img src='" + element.icon + "' width='24' height='28'>&nbsp;" + element.type.substring( 0, element.type.indexOf( "_delta" ) )] = featuresInfo[element.type]["layer"];      
   }
@@ -367,23 +389,23 @@ $(document).one("ajaxStop", function () {
   sizeLayerControl();
   
   var bounds = new L.LatLngBounds(new L.LatLng(41.5585288, -8.3987357), new L.LatLng(41.5585288, -8.3987357));
-    // map.fitBounds(featuresInfo[Object.keys(featuresInfo)[0]].markers.getBounds());
-    map.fitBounds(bounds);
+  // map.fitBounds(featuresInfo[Object.keys(featuresInfo)[0]].markers.getBounds());
+  map.fitBounds(bounds);
   featureList = new List("features", {valueNames: ["feature-name"]});
   featureList.sort("feature-name", {order:"asc"});
-
+  
   $.each(featuresInfo, function(i, element) {
     element.bh = new Bloodhound({
-        name: element.type,
-        datumTokenizer: function (d) {
-            return Bloodhound.tokenizers.whitespace(d.name);
-        },
-        queryTokenizer: Bloodhound.tokenizers.whitespace,
-        local: element.search,
-        limit: 10
+      name: element.type,
+      datumTokenizer: function (d) {
+        return Bloodhound.tokenizers.whitespace(d.name);
+      },
+      queryTokenizer: Bloodhound.tokenizers.whitespace,
+      local: element.search,
+      limit: 10
     });                
   });
-
+  
   var geonamesBH = new Bloodhound({
     name: "GeoNames",
     datumTokenizer: function (d) {
@@ -418,21 +440,21 @@ $(document).one("ajaxStop", function () {
     element['bh'].initialize();        
   }); 
   geonamesBH.initialize();
-
+  
   /* instantiate the typeahead UI */
   $("#searchbox").typeahead({
     minLength: 3,
     highlight: true,
     hint: false
   }, {            // TODO
-  //   name: "D4",
-  //   displayKey: "name",
-  //   source: featuresInfo['D4']['bh'].ttAdapter(),
-  //   templates: {
-  //     header: "<h4 class='typeahead-header'><img src='https://github.com/taniaesteves/UCE15/blob/master/Code/Model/Catalogs/sinais_de_transito/icons/D4.png?raw=true' width='24' height='28'>&nbsp;D4</h4>",
-  //     suggestion: Handlebars.compile(["{{name}}<br>&nbsp;<small>{{address}}</small>"].join(""))
-  //   }
-  // }, {
+    //   name: "D4",
+    //   displayKey: "name",
+    //   source: featuresInfo['D4']['bh'].ttAdapter(),
+    //   templates: {
+    //     header: "<h4 class='typeahead-header'><img src='https://github.com/taniaesteves/UCE15/blob/master/Code/Model/Catalogs/sinais_de_transito/icons/D4.png?raw=true' width='24' height='28'>&nbsp;D4</h4>",
+    //     suggestion: Handlebars.compile(["{{name}}<br>&nbsp;<small>{{address}}</small>"].join(""))
+    //   }
+    // }, {
     name: "GeoNames",
     displayKey: "name",
     source: geonamesBH.ttAdapter(),
@@ -442,14 +464,14 @@ $(document).one("ajaxStop", function () {
   }).on("typeahead:selected", function (obj, datum) {    
     $.each(featuresInfo, function(i, element) {
       if (datum.source === element.type) {
-          if (!map.hasLayer(element.layer)) {
-              map.addLayer(element.layer);
-              console.log("add layer");
-          }
-          map.setView([datum.lat, datum.lng], 17);
-          if (map._layers[datum.id]) {
-              map._layers[datum.id].fire("click");
-          }
+        if (!map.hasLayer(element.layer)) {
+          map.addLayer(element.layer);
+          console.log("add layer");
+        }
+        map.setView([datum.lat, datum.lng], 17);
+        if (map._layers[datum.id]) {
+          map._layers[datum.id].fire("click");
+        }
       }  
     });                    
     if (datum.source === "GeoNames") {

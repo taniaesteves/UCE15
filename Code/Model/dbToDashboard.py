@@ -8,11 +8,25 @@ import json
 import datetime
 import io
 from pprint import pprint
+import os
+import re
 
 try:
     to_unicode = unicode
 except:
     to_unicode = str
+
+def getmarkerimages(markerid, feature, markersinfo):
+	imagelimit = 0
+	imagedirpath = re.sub("\s+", "_", catalog_title.lower()) + '/figures'
+	dirpath = '/home/atlas/AtlasInnovation/UCE15/Code/Model/Catalogs/' + imagedirpath		
+	for imagefile in os.listdir(dirpath):				
+		if imagefile.startswith(str(markerid) + '_' + feature + "_"):
+			print(imagefile)
+			if imagelimit > 20:
+				break
+			markersinfo["properties"]["IMAGES"].append(imagedirpath + "/" + imagefile)				
+			imagelimit += 1
 
 '''Create an encoder subclassing JSON.encoder. 
 Make this encoder aware of our classes (e.g. datetime.datetime objects) 
@@ -94,13 +108,17 @@ print("row count: " +  str(cur.rowcount))
 features = cur.fetchall()
 featuresinfo = []
 
+# ----------- ALL -----------
+
 for feature in features:
+	n_markers = 0
 
 	# add feature to featuresinfo struct
 	actualfeature = {
 		"type": feature[1],
 		"title": feature[2],
-		"icon": feature[3]
+		"icon": feature[3],
+		"delta": "All"
 	}
 
 	# feature file content struct
@@ -128,18 +146,22 @@ for feature in features:
 				"TIMESTAMP": str(marker[4]), 
 				"PRECISION": marker[5], 
 				"NOTA": marker[6], 
-				"IMAGE": marker[3],
+				"IMAGES": [],
 				"ADDRESS": marker[7]
 			}, 
 			"geometry": { 
 				"type": "Point", 
 				"coordinates": [ marker[2], marker[1]  ] 
 			} 
-		}
-		featurecontent["features"].append(actualfeatureinfo);
+		}		
+		getmarkerimages(marker[0], feature[1], actualfeatureinfo)
+		if len(actualfeatureinfo["properties"]["IMAGES"]) == 0:
+			actualfeatureinfo["properties"]["IMAGES"] = [marker[3]]
+		featurecontent["features"].append(actualfeatureinfo)
+		n_markers += 1
 
 
-	if len(markers) > 0:
+	if n_markers > 0:
 		featuresinfo.append(actualfeature)
 		# Write JSON file
 		featuremarkersfilename = unidecode.unidecode("/home/atlas/geojsons/" + feature[1] + ".geojson")
@@ -150,9 +172,119 @@ for feature in features:
 		    outfile.write(to_unicode(str_))
 		print("\nFile '" + featuremarkersfilename + " created successfully!")	
 
+# ----------- DELTA -----------
+for feature in features:
+	n_markers = 0
+
+	# add feature to featuresinfo struct
+	actualfeature = {
+		"type": feature[1] + '_delta',
+		"title": feature[2],
+		"icon": feature[3],
+		"delta": "LastMonth"
+	}
+
+	# feature file content struct
+	featurecontent = {
+		"type": "FeatureCollection",
+		"features": []
+	}
+
+	# search: os marcadores que foram vistos pela ultima vez há mais de 15 dias (exceptos os novos marcadores):
+	try:
+		cur.execute("SELECT id, latitude, longitude, imagepath, first_timestamp, last_timestamp, precision, note, address \
+					FROM marker \
+					WHERE \
+					featureid = " + str(feature[0]) + " \
+					AND EXTRACT(YEAR FROM last_timestamp) = EXTRACT(YEAR FROM (CURRENT_DATE - INTERVAL '1 month')) \
+					AND first_timestamp < CURRENT_DATE - INTERVAL '1 month' \
+					AND last_timestamp < CURRENT_DATE - INTERVAL '15 days';")
+	except:
+		print("\nERROR: UNABLE TO GET REMOVED MARKERS")
+		exit()
+
+	markers = cur.fetchall()
+	
+	for marker in markers:
+		# feature's markers
+		actualfeatureinfo = {
+			"type": "Feature",
+			"id": marker[0],
+			"properties": { 
+				"TITLE": feature[1] + " - " + marker[8], 
+				"TIMESTAMP": str(marker[5]), 
+				"PRECISION": marker[6], 
+				"NOTA": marker[7], 
+				"IMAGES": [],
+				"ADDRESS": marker[8],
+				"DELTA": "removed"
+			}, 
+			"geometry": { 
+				"type": "Point", 
+				"coordinates": [ marker[2], marker[1]  ] 
+			} 
+		}
+		getmarkerimages(marker[0], feature[1], actualfeatureinfo)
+		if len(actualfeatureinfo["properties"]["IMAGES"]) == 0:
+			actualfeatureinfo["properties"]["IMAGES"] = [marker[3]]
+		featurecontent["features"].append(actualfeatureinfo)
+		n_markers += 1
+
+	# search: Novos marcadores (que foram vistos pela ultima vez nos ultimos 15 dias):
+	try:
+		cur.execute("SELECT id, latitude, longitude, imagepath, first_timestamp, last_timestamp, precision, note, address \
+					FROM marker \
+					WHERE \
+					featureid = " + str(feature[0]) + " \
+					AND first_timestamp > CURRENT_DATE - INTERVAL '1 month';")
+					# AND last_timestamp >= CURRENT_DATE - INTERVAL '15 days';")
+	except:
+		print("\nERROR: UNABLE TO GET NEW MARKERS")
+		exit()
+
+	markers = cur.fetchall()
+	
+	for marker in markers:
+		# feature's markers
+		actualfeatureinfo = {
+			"type": "Feature",
+			"id": marker[0],
+			"properties": { 
+				"TITLE": feature[1] + " - " + marker[8], 
+				"TIMESTAMP": str(marker[5]), 
+				"PRECISION": marker[6], 
+				"NOTA": marker[7], 
+				"IMAGES": [],
+				"ADDRESS": marker[8],
+				"DELTA": "added"
+			}, 
+			"geometry": { 
+				"type": "Point", 
+				"coordinates": [ marker[2], marker[1]  ] 
+			} 
+		}
+		getmarkerimages(marker[0], feature[1], actualfeatureinfo)
+		if len(actualfeatureinfo["properties"]["IMAGES"]) == 0:
+			actualfeatureinfo["properties"]["IMAGES"] = [marker[3]]
+		featurecontent["features"].append(actualfeatureinfo)
+		n_markers += 1
+
+	if n_markers > 0:
+		featuresinfo.append(actualfeature)
+		# Write JSON file
+		featuremarkersfilename = unidecode.unidecode("/home/atlas/geojsons/" + feature[1] + "_delta.geojson")
+		with io.open(featuremarkersfilename, 'w', encoding='LATIN-1') as outfile:
+		    str_ = json.dumps(featurecontent, cls=Encoder,
+		                      indent=4, sort_keys=True,
+		                      separators=(',', ': '), ensure_ascii=False)
+		    outfile.write(to_unicode(str_))
+		print("\nFile '" + featuremarkersfilename + " created successfully!")	
+
+
+
 # Write JSON file
 featuresfilename = unidecode.unidecode("/home/atlas/geojsons/featuresinfo.json")
-with io.open(featuresfilename, 'w', encoding='utf8') as outfile:
+with io.open(featuresfilename, 'w', encoding='LATIN-1') as outfile:
     str_ = json.dumps(featuresinfo,
                       indent=4, sort_keys=True,
                       separators=(',', ': '), ensure_ascii=False)

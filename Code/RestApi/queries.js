@@ -49,17 +49,18 @@ function createMarker(req, res, next) {
         [req.body.latitude, req.body.longitude, idfeat]).then(dados => {
         console.log("Marker atualizado");
         // marker mais perto
-        console.log(dados[0]);
+        // console.log(dados[0]);
         // calcular as media das precisions e da longi e lati para dar update ao marker(last timestamp, longi, lat e preci e total-detections)
         var uplatitude = (dados[0].latitude * dados[0].total_detections + req.body.latitude) / (dados[0].total_detections + 1);
         var uplongitude = (dados[0].longitude * dados[0].total_detections + req.body.longitude) / (dados[0].total_detections + 1);
         var upprecision = (dados[0].precision * dados[0].total_detections + req.body.precision) / (dados[0].total_detections + 1);
-        db.none('update marker set latitude = $1, longitude = $2, last_timestamp = $3 , precision = $4, total_detections = $5 where id = $6', [uplatitude, uplongitude, req.body.timestamp, upprecision, (dados[0].total_detections+1), dados[0].id]).then(function () {}).catch(function (err) { console.log(err); return next(err); });
         // guardar imagem com informações do marker correspondente
         var imageName = dados[0].id +'_'+ req.body.label +'_'+req.body.timestamp +'_'+req.body.latitude+'_'+req.body.longitude+'.PNG';
         imageName = imageName.replace(/ /g, "_"); imageName = imageName.replace(/:/g, "-");
         var filesave = '../Model/Catalogs/sinais_de_transito/figures/' + imageName;
         fs.writeFileSync(filesave, buff);
+        req.body.image = 'sinais_de_transito/figures/'+imageName;
+        db.none('update marker set latitude = $1, longitude = $2, imagepath = $3, last_timestamp = $4 , precision = $5, total_detections = $6 where id = $7', [uplatitude, uplongitude, req.body.image, req.body.timestamp, upprecision, (dados[0].total_detections+1), dados[0].id]).then(function () {}).catch(function (err) { console.log(err); return next(err); });
         // resposta ao pedido
         res.status(200).json({
         status: 'success',
@@ -70,7 +71,7 @@ function createMarker(req, res, next) {
         console.log("Novo marker");
         // buscar localização com o geocoder para o novo marker
         geocoder.reverse({lat:req.body.latitude, lon:req.body.longitude}).then(res1 => {
-          console.log(res1);
+          // console.log(res1);
           localidade = res1[0].streetName + ', ' + res1[0].city;
           // inserir marker na BD
           db.one('insert into marker(featureid, latitude, longitude,imagepath, first_timestamp, last_timestamp, precision, total_detections, address, ocurr)' +
