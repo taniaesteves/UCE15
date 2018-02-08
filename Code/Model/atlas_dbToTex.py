@@ -68,15 +68,27 @@ if rows == []:
 
 
 # Tex FILE
-filename = "/home/atlas/data/" + unidecode.unidecode(catalog_title.replace(" ", "_") + ".json").lower()
+filename = "/home/atlas/data/" + unidecode.unidecode(catalog_title.replace(" ", "_") + ".tex").lower()
 f = io.open(filename, "w", encoding='utf-8')
+
+f.write("\\documentclass[a4paper,]{report}\n")
+f.write("\\usepackage[utf8]{inputenc}\n")
+f.write("\\usepackage{natbib}\n")
+f.write("\\usepackage{graphicx}\n\n")
+f.write("\\usepackage{pdfpages}\n")
+f.write("\\usepackage{float}\n")
+f.write("\\usepackage{grffile}\n")
+
+f.write("\\begin{document}\n")
+f.write("\\includepdf{Capa.pdf}\n")
+
+
+f.write("\n")
 
 catalog_id = rows[0][0]
 
 psycopg2.extensions.register_type(psycopg2.extensions.UNICODE, cur)
 print("encoding: " + conn.encoding)
-
-f.write("{\n")
 
 try:
     cur.execute("SELECT m.id, f.title, m.latitude, m.longitude, m.imagepath, m.first_timestamp, m.last_timestamp, m.precision, m.total_detections, m.address FROM marker m \
@@ -86,22 +98,30 @@ except:
     print("\nERROR: UNABLE TO GET FEATURES")
     exit()
 
+f.write("\chapter{ Markers }\n")
+
 rows = cur.fetchall()
 markers = rows
+incre = 1
 for marker in markers:
-    f.write("\t\"marker" + str(marker[0]) +"\" : {\n")
-    f.write("\t\t\"feature\" : \""+marker[1]+ "\",\n")
-    f.write("\t\t\"latitude\" : "+str(marker[2])+ ",\n")
-    f.write("\t\t\"longitude\" : "+str(marker[3])+ ",\n")
-    f.write("\t\t\"imgURL\" : \""+marker[4]+ "\",\n")
-    f.write("\t\t\"first timestamp\" : \""+ str(marker[5])+ "\",\n")
-    f.write("\t\t\"last timestamp\" : \""+ str(marker[6])+ "\",\n")
-    f.write("\t\t\"precision\" : \""+str(marker[7])+ "\",\n")
-    f.write("\t\t\"total detections\" : \"" + str(marker[8])+ "\",\n")
-    f.write("\t\t\"Address\" : \"" + str(marker[9])+ "\"\n")
-    f.write("\t},\n")
+    f.write("\section{marker "+str(incre) +"}\n")
+    f.write("\\begin{itemize}\n")
+    f.write("\item feature: " + marker[1] + "\n" )
+    f.write("\item latitude: "+ str(marker[2])+ "\n")
+    f.write("\item longitude: "+ str(marker[3])+ "\n")
+    f.write("\item first timestamp: "+ str(marker[5])+ "\n")
+    f.write("\item last timestamp: "+ str(marker[6])+ "\n")
+    f.write("\item precision: "+ str(marker[7])+ "\n")
+    f.write("\item total detections: "+ str(marker[8])+ "\n")
+    f.write("\item Address: "+ str(marker[9])+ "\n")
+    f.write("\\begin{figure}[H]\n")
+    f.write("\t\\centering\n")
+    f.write("\t\\includegraphics[width=0.5\\textwidth]{Catalogs/"+ str(marker[4]) +"}\n")
+    f.write("\\end{figure}\n")
+    incre += 1
+    f.write("\\end{itemize}\n")
 
-f.write("}")
+f.write("\end{document} \n")
 f.close()
 
 print("\nFile '" + filename + " created successfully!")
