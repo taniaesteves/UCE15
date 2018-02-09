@@ -47,7 +47,6 @@ do
 	echo  "$now: > Copying files to "
 	rm $dashboardDir/data/*	
 	
-	
 	cp $dataDir/* $dashboardDir/data/
 
 	getCurrentTime
