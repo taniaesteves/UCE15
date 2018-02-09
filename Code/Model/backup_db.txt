@@ -1,0 +1,11 @@
+psql -h localhost
+sudo systemctl status atlas.service
+
+
+Guardar:
+
+COPY marker TO '/home/atlas/markers_backup_U8.csv' WITH DELIMITER ',' CSV HEADER  ENCODING 'utf-8';
+
+Carregar:
+
+COPY marker FROM '/home/atlas/markers_backup_U8.csv' WITH DELIMITER ',' CSV HEADER  ENCODING 'utf-8';
