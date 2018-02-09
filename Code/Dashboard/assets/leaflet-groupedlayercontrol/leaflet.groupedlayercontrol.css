@@ -4,6 +4,13 @@
   display: block;
 }
 
+.leaflet-control-layers-selectAll {
+  font-weight: bold;
+  margin-bottom: .2em;
+  display: inline-block;
+  padding-right: .5em;
+}
+
 .leaflet-control-layers-group {
   margin-bottom: .5em;
 }
@@ -20,4 +27,9 @@
 
 .leaflet-control-layers-time-group {
   margin-bottom: .5em;
+}
+
+input{
+
+  vertical-align:middle; 
 }

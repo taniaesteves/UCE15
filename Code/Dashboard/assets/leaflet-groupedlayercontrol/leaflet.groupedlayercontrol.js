@@ -284,11 +284,25 @@ L.Control.GroupedLayers = L.Control.extend({
         groupContainer.className = 'leaflet-control-layers-group';
         groupContainer.id = 'leaflet-control-layers-group-' + obj.group.id;
 
-        var groupLabel = document.createElement('span');
-        groupLabel.className = 'leaflet-control-layers-group-name';
-        groupLabel.innerHTML = obj.group.name;
+        var label = document.createElement('label');
 
-        groupContainer.appendChild(groupLabel);
+        var groupLabel = document.createElement('span');
+        groupLabel.className = 'leaflet-control-layers-selectAll';
+        // groupLabel.innerHTML = obj.group.name;
+        groupLabel.innerHTML = 'Select All'
+    
+        var checkbox = document.createElement('input');
+        checkbox.type = "checkbox";
+        checkbox.name = "name";
+        // checkbox.setAttribute('className', 'leaflet-control-layers-selector');
+        checkbox.value = "value";
+        checkbox.id = "id";        
+    
+        label.appendChild(groupLabel);
+        label.appendChild(checkbox);
+        L.DomEvent.on(checkbox, 'click', this._onInputClick, this);
+
+        groupContainer.appendChild(label);
         container.appendChild(groupContainer);
 
         this._domGroups[obj.group.id] = groupContainer;
@@ -340,14 +354,27 @@ L.Control.GroupedLayers = L.Control.extend({
     groupContainer.className = 'leaflet-control-layers-group';
     groupContainer.id = 'leaflet-control-layers-group-' + id;
 
-    var groupLabel = document.createElement('span');
-    groupLabel.className = 'leaflet-control-layers-group-name';
-    if (id == 0)
-      groupLabel.innerHTML = "Points of Interest";
-    else if (id == 1)
-      groupLabel.innerHTML = "Points of Interest";
+    var label = document.createElement('label');
 
-    groupContainer.appendChild(groupLabel);
+    var groupLabel = document.createElement('span');
+    groupLabel.className = 'leaflet-control-layers-selectAll';
+    if (id == 0)
+      groupLabel.innerHTML = "Select All";
+    else if (id == 1)
+      groupLabel.innerHTML = "Select All";
+
+    var checkbox = document.createElement('input');
+    checkbox.type = "checkbox";
+    checkbox.name = "name";
+    // checkbox.setAttribute('className', 'leaflet-control-layers-selector');
+    checkbox.value = "value";
+    checkbox.id = "id";        
+
+    label.appendChild(groupLabel);
+    label.appendChild(checkbox);
+    L.DomEvent.on(checkbox, 'click', this._onInputClick, this);
+
+    groupContainer.appendChild(label);
     
     document.getElementsByClassName("leaflet-control-layers-overlays")[0].appendChild(groupContainer);          
   },
@@ -359,22 +386,38 @@ L.Control.GroupedLayers = L.Control.extend({
 
     this._handlingClick = true;
 
-    for (i = 0; i < inputsLen; i++) {
-      if (i != 2 && i != 3) {
-        input = inputs[i];
-        obj = this._layers[input.layerId];
-
-        
-        
-
-        if (input.checked && !this._map.hasLayer(obj.layer)) {
+    if (!inputs[4].checked) {
+      for (j = 5; j < inputsLen; j++) {
+        input2 = inputs[j];
+        input2.checked = '';
+        obj = this._layers[input2.layerId]; 
+        this._map.removeLayer(obj.layer);
+      }
+    } else {
+      //console.log(inputs[4].checked);
+      if (inputs[3].checked) {
+        for (j = 5; j < inputsLen; j++) {
+          input2 = inputs[j];
+          obj = this._layers[input2.layerId]; 
+          if (obj.type === "All") {
+            if (this._map.hasLayer(obj.layer)) 
+              this._map.removeLayer(obj.layer);
+          } else if (obj.type === "LastMonth") 
+          input2.checked = 'checked'                             
           this._map.addLayer(obj.layer);
-
-        } else if (!input.checked && this._map.hasLayer(obj.layer)) {
-          this._map.removeLayer(obj.layer);
+        }
+      } else if (inputs[2].checked) {
+        for (j = 5; j < inputsLen; j++) {
+          input2 = inputs[j];
+          obj = this._layers[input2.layerId]; 
+          if (obj.type === "LastMonth") {
+            if (this._map.hasLayer(obj.layer)) 
+              this._map.removeLayer(obj.layer);
+          } else if (obj.type === "All") 
+          input2.checked = 'checked'                             
+          this._map.addLayer(obj.layer);
         }
       }
-      
     }
 
     this._handlingClick = false;
@@ -398,6 +441,9 @@ L.Control.GroupedLayers = L.Control.extend({
         this._map.removeLayer(obj.layer);
       }      
     }
+
+    if (inputs[4].checked)
+      inputs[4].checked = '';
      
     if (inputs[3].checked) {
 
@@ -414,7 +460,7 @@ L.Control.GroupedLayers = L.Control.extend({
         }
       }
       
-      for (j = 4; j < inputsLen; j++) {
+      for (j = 5; j < inputsLen; j++) {
         input2 = inputs[j];
         obj = this._layers[input2.layerId]; 
         if (obj.type === "All") {
@@ -446,7 +492,7 @@ L.Control.GroupedLayers = L.Control.extend({
         }
       }
       // document.getElementById("leaflet-control-layers-group-0").style.visibility = "visible";
-      for (j = 4; j < inputsLen; j++) {
+      for (j = 5; j < inputsLen; j++) {
         input2 = inputs[j];
         obj = this._layers[input2.layerId];
         
@@ -467,6 +513,7 @@ L.Control.GroupedLayers = L.Control.extend({
     } 
 
     this._handlingClick = false;
+
 
     
   },
